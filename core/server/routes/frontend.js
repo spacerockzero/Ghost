@@ -1,9 +1,11 @@
-var frontend    = require('../controllers/frontend'),
-    config      = require('../config'),
-    errors      = require('../errors'),
-    express     = require('express'),
-    utils       = require('../utils'),
-
+var frontend = require('../controllers/frontend'),
+    config   = require('../config'),
+    errors   = require('../errors'),
+    express  = require('express'),
+    utils    = require('../utils'),
+    path     = require('path'),
+    fs       = require('fs'),
+    sw       = fs.readFileSync(path.join(process.cwd(),'service-worker.js'), 'utf8'),
     frontendRoutes;
 
 frontendRoutes = function frontendRoutes(middleware) {
@@ -45,6 +47,7 @@ frontendRoutes = function frontendRoutes(middleware) {
         }
     }
 
+
     // ### Admin routes
     router.get(/^\/(logout|signout)\/$/, function redirectToSignout(req, res) {
         redirect301(res, subdir + '/ghost/signout/');
@@ -80,6 +83,11 @@ frontendRoutes = function frontendRoutes(middleware) {
 
     // Index
     indexRouter.route('/').get(frontend.index);
+    indexRouter.route('/service-worker.js').get(function(req, res) {
+      res.type('application/javascript')
+      res.write(sw)
+      res.end()
+    });
     indexRouter.route('/' + routeKeywords.page + '/:page/').get(frontend.index);
     indexRouter.param('page', handlePageParam);
     indexRouter.use(rssRouter);
