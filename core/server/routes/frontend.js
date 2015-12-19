@@ -5,7 +5,6 @@ var frontend = require('../controllers/frontend'),
     utils    = require('../utils'),
     path     = require('path'),
     fs       = require('fs'),
-    sw       = fs.readFileSync(path.join(process.cwd(),'service-worker.js'), 'utf8'),
     frontendRoutes;
 
 frontendRoutes = function frontendRoutes(middleware) {
@@ -83,7 +82,9 @@ frontendRoutes = function frontendRoutes(middleware) {
 
     // Index
     indexRouter.route('/').get(frontend.index);
+    // Respond to service-worker request, if it exists
     indexRouter.route('/service-worker.js').get(function(req, res) {
+      var sw = fs.readFileSync(path.join(process.cwd(),'service-worker.js'), 'utf8')
       res.type('application/javascript')
       res.write(sw)
       res.end()
